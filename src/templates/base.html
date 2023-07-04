@@ -1,0 +1,51 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+{#    <script async src="https://www.googletagmanager.com/gtag/js?id=G-0F3B9QH4JK"></script>#}
+{#    <script>#}
+{#        window.dataLayer = window.dataLayer || [];#}
+{#        function gtag(){dataLayer.push(arguments);}#}
+{#        gtag('js', new Date());#}
+{#        gtag('config', 'G-0F3B9QH4JK');#}
+{#    </script>#}
+
+    <meta charset="utf-8" />
+    <title>{{ title }} | Production Flow</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- App favicon -->
+    <link rel="shortcut icon" href="{% static 'assets/images/64x64_V001.png' %}">
+
+    {% block css  %}{% endblock css %}
+
+    <script type="text/javascript">
+        base_url = '{{ HTTP_HOST }}/';
+        media_url = '{{ HTTP_HOST }}/media/';
+    </script>
+
+</head>
+
+<body style="background: #F6F8FC;">
+
+<!-- Begin page -->
+<div id="layout-wrapper">
+    {% include 'layout/header.html' %}
+    {% block content %}{% endblock content %}
+
+
+</div>
+<!-- END layout-wrapper -->
+
+
+
+<!-- JAVASCRIPT -->
+
+{% block js %}{% endblock js %}
+
+
+</body>
+
+</html>

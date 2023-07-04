@@ -1,0 +1,56 @@
+{% load static %}
+
+<header id="page-topbar" style="background: #F6F8FC;">
+    <div class="navbar-header">
+        <div class="d-flex">
+            <!-- LOGO -->
+            <div class="navbar-brand-box">
+                <a href="/" class="logo logo-dark">
+                    <span class="logo-sm"><img src="{% static 'assets/images/300x300_V001.png' %}" alt="" height="35"></span>
+                    <span class="logo-lg"><img src="{% static 'assets/images/pdf.png' %}" alt="" height="35"></span>
+                </a>
+
+                <a href="/" class="logo logo-light">
+                    <span class="logo-sm"><img src="{% static 'assets/images/300x300_V001.png' %}" alt="" height="35"></span>
+                    <span class="logo-lg"><img src="{% static 'assets/images/pdf.png' %}" alt="" height="35"></span>
+                </a>
+            </div>
+        </div>
+        {% if request.get_full_path  != '/checkout' %}
+            <div class="d-flex">
+                <div class="btn-group me-1 mt-2">
+                    <button class="btn btn-gray-100 btn-lg" type="button" contenteditable="true" spellcheck="false" id="company_title" company_id="0"> Change Company
+                    </button>
+                    <button type="button" class="btn btn-gray-200 btn-lg dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="mdi mdi-chevron-down"></i>
+                    </button>
+                    <div class="dropdown-menu" id="tbody_company"> </div>
+                </div>
+            </div>
+        {% endif %}
+
+        <div class="d-flex">
+            <div class="dropdown d-none d-sm-inline-block">
+                <button type="button" class="btn header-item" style="font-weight:bold;" onclick=" window.open('https://visionaryfire.com/productionflow/','_blank')">Help</button>
+            </div>
+
+            <div class="dropdown d-inline-block"  style="background: #fff;">
+                <button type="button" class="btn header-item bg-soft-light border-start border-end" id="page-header-user-dropdown"
+                        data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <img class="rounded-circle header-profile-user" src="{% static 'assets/images/64x64_V001.png' %}"
+                         alt="Header Avatar">
+                    <span class="d-none d-xl-inline-block ms-1 fw-medium">{{ request.user.first_name }}</span>
+                    <i class="mdi mdi-chevron-down d-none d-xl-inline-block"></i>
+                </button>
+                <div class="dropdown-menu dropdown-menu-end">
+                    <!-- item-->
+                    <a class="dropdown-item" href="/"><i class="mdi mdi-face-profile font-size-16 align-middle me-1"></i> Profile</a>
+                    <a class="dropdown-item" href="javascript:" id="secret_key"><i class="mdi mdi-content-copy font-size-16 align-middle me-1"></i>Secret Key</a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="/accounts/logout"><i class="mdi mdi-logout font-size-16 align-middle me-1"></i> Logout</a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</header>
