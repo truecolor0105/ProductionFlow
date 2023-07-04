@@ -1,0 +1,357 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block css %}
+
+    <link href="{% static 'assets/css/themes/lite-purple.min.css' %}" rel="stylesheet" />
+    <link href="{% static 'assets/css/plugins/perfect-scrollbar.min.css' %}" rel="stylesheet" />
+{% endblock css %}
+
+{% block content %}
+
+    <!-- Image loader -->
+
+    <!-- Image loader -->
+    <div class="main-content">
+        <div class="row mb-4">
+            <div class="col-md-3 mb-4">
+                <div class="card text-left">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="display table table-striped table-bordered" style="width:100%">
+                                <thead>
+                                <tr>
+                                    <th>Project</th>
+                                </tr>
+                                </thead>
+                                <tbody id="tbody_project"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-9 mb-4">
+                <div class="card text-left">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="display table table-striped table-bordered" style="width:100%">
+                                <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Worker</th>
+                                    <th>State</th>
+                                </tr>
+                                </thead>
+                                <tbody id="tbody_tasks"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- end of col-->
+    </div>
+    <!-- end of row-->
+
+{% endblock content %}
+
+
+{% block js %}
+    <script src="{% static 'assets/js/plugins/jquery-3.3.1.min.js' %}"></script>
+    <script src="{% static 'assets/js/plugins/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'assets/js/plugins/perfect-scrollbar.min.js' %}"></script>
+    <script src="{% static 'assets/js/scripts/script.min.js' %}"></script>
+    <script src="{% static 'assets/js/scripts/sidebar-horizontal.script.js' %}"></script>
+
+
+
+    <script>
+        $(function () {
+            get_project();
+
+            //done
+
+
+            //done
+            function get_project(data_id) {
+                $.ajax({
+                    type: 'ajax',
+                    url: base_url + 'api_project',
+                    method: 'get',
+                    data:{
+                        'data_id':data_id
+                    },
+                    dataType: 'json',
+                    success: function (data) {
+                        set_tbl_project(data);
+                    },
+                    error: function () {
+                        console.log('error');
+                    }
+                });
+            }
+            //done
+            function set_tbl_project(data) {
+                let project_tr = '';
+                let i;
+                for (i = 0; i < data.length; i++) {
+                    let count = i + 1;
+                    let id = data[i]["id"];
+                    let name = data[i]["name"];
+                    project_tr += '<tr class="project_row" data_id="'+id+'" >';
+                    project_tr += '<td><input class="form-control p_name" data_id="'+id+'" type="text" value="'+name+'"></td>';
+                    project_tr += '</tr>';
+                }
+                {#project_tr += '<tr><td><input type="text" class="form-control proj_name" /></td></tr>';#}
+                $('#tbody_project').html(project_tr);
+            }
+            //done
+            $(document).on("keypress", ".proj_name", function(e) {
+                let data_value = $(this).val();
+                if(e.which == 13) {
+                    create_proj_name(data_value);
+                }
+            });
+            //done
+            function create_proj_name(data_value){
+                $.ajax({
+                    url: base_url + 'api_create_project',
+                    method: 'POST',
+                    type: 'json',
+                    data: {
+                        'csrfmiddlewaretoken': '{{ csrf_token }}',
+                        'name':data_value,
+                    },
+                    success: function (data) {
+                        if (data['success'] == 1) {
+                            get_project();
+                        } else {
+                            console.log('error');
+                        }
+                    },
+                    error: function () {
+                        console.log('error');
+                    }
+                });
+            }
+            //done
+            $(document).on('keyup', '.p_name', function() {
+                let data_id = ($(this).attr('data_id')).toString();
+                let data_value = $(this).val();
+                update_project(data_id, data_value)
+            });
+            //done
+            function update_project(data_id, data_value){
+                $.ajax({
+                    url: base_url + 'api_update_project',
+                    method: 'POST',
+                    type: 'json',
+                    data: {
+                        'csrfmiddlewaretoken': '{{ csrf_token }}',
+                        'data_id': data_id,
+                        'data_value': data_value
+                    },
+                    success: function (data) {
+                        if (data['success'] == 1) {
+                            console.log('success');
+                        } else {
+                            console.log('error');
+                        }
+                    },
+                    error: function () {
+                        console.log('error');
+                    }
+                });
+
+            }
+
+            $('#tbody_project_state').on("keyup", ".project_state_name", function(e)  {
+                let data_id = ($(this).attr('data_id')).toString();
+                let data_value = $(this).val();
+                let data_of = 'name';
+                update_project_state(data_id, data_of, data_value);
+            });
+
+
+            $('#tbody_project_state').on("keyup", ".project_state_due_date", function(e)  {
+                let data_id = ($(this).attr('data_id')).toString();
+                let data_value = $(this).val();
+                let data_of = 'due_date';
+                update_project_state(data_id, data_of, data_value);
+            });
+
+
+            $('#tbody_project_state').on("change", ".project_state_worker", function(e)  {
+                let data_id = ($(this).attr('data_id')).toString();
+                let data_value = $(this).val();
+                let data_of = 'worker';
+                update_project_state(data_id, data_of, data_value);
+            });
+
+            function update_project_state(data_id, data_of, data_value){
+                $.ajax({
+                    url: base_url + 'api_update_project_state',
+                    method: 'POST',
+                    type: 'json',
+                    data: {
+                        'csrfmiddlewaretoken': '{{ csrf_token }}',
+                        'data_id': data_id,
+                        'data_of':data_of,
+                        'data_value': data_value
+                    },
+                    success: function (data) {
+                        if (data['success'] == 1) {
+                            console.log('success');
+                        } else {
+                            console.log('error');
+                        }
+                    },
+                    error: function () {
+                        console.log('error');
+                    }
+                });
+
+            }
+
+
+            // END State Section
+
+
+
+            $("#tbody_project").on("click", ".project_row", function(e) {
+                let data_id = ($(this).attr('data_id')).toString();
+                get_tasks(data_id);
+                $('#tbody_project_state').html('');
+            });
+
+            function get_tasks(data_id) {
+                $.ajax({
+                    type: 'ajax',
+                    url: base_url + 'api_task',
+                    method: 'get',
+                    dataType: 'json',
+                    data: {
+                        'data_id':data_id,
+                    },
+                    success: function (data) {
+                        set_tbl_tasks(data, data_id);
+                    },
+                    error: function () {
+                        console.log('error');
+                    }
+                });
+            }
+            function set_tbl_tasks(data, data_id) {
+                let tasks_tr = '';
+                let i, opt, worker;
+                for (i = 0; i < data.length; i++) {
+                    let taskstate = data[i]["taskstate"];
+                    let options = '';
+                    for (opt = 0; opt < taskstate.length; opt++) {
+                        let op_id = taskstate[opt]["id"];
+                        let op_worker = taskstate[opt]["worker"];
+                        let op_name = taskstate[opt]["name"];
+                        let select = taskstate[opt]["select"];
+                        if(opt === 0) {
+                            options += '<option value="' + op_id + '" selected>' + op_name + '</option>';
+                            worker = op_worker;
+                        }else if(select === true) {
+                            options += '<option value="' + op_id + '" selected>' + op_name + '</option>';
+                            worker = op_worker;
+                        }else {
+                            options += '<option value="' + op_id + '">' + op_name + '</option>';
+                        }
+                    }
+                    let id = data[i]["id"];
+                    let name = data[i]["name"];
+
+                    tasks_tr += '<tr class="task_row" data_id="'+id+'" >';
+                    tasks_tr += '<td><input class="form-control t_name" data_id="'+id+'" type="text" value="'+name+'"></td>';
+                    tasks_tr += '<td><input class="form-control" type="text" value="'+worker+'" readonly></td>';
+                    tasks_tr += '<td><select class="form-control t_state" data_id="'+id+'">'+options+'</select></td>';
+
+                    tasks_tr += '</tr>';
+
+                }
+                {#tasks_tr += '<tr><td><input type="text" class="form-control task_name" data_id="'+data_id+'"/></td></tr>';#}
+                $('#tbody_tasks').html(tasks_tr);
+            }
+
+
+            $(document).on("keypress", ".task_name", function(e) {
+                let data_value = $(this).val();
+                let data_id = ($(this).attr('data_id')).toString();
+                if(e.which == 13) {
+                    create_task_name(data_value, data_id);
+                }
+            });
+
+            function create_task_name(data_value, data_id){
+                $.ajax({
+                    url: base_url + 'api_create_task',
+                    method: 'POST',
+                    type: 'json',
+                    data: {
+                        'csrfmiddlewaretoken': '{{ csrf_token }}',
+                        'name':data_value,
+                        'data_id':data_id,
+                    },
+                    success: function (data) {
+                        if (data['success'] == 1) {
+                            get_tasks(data_id);
+                            $(".task_name").val('');
+                        } else {
+                            console.log('error');
+                        }
+                    },
+                    error: function () {
+                        console.log('error');
+                    }
+                });
+            }
+
+            $(document).on('keyup', '.t_name', function() {
+                let data_id = ($(this).attr('data_id')).toString();
+                let data_value = $(this).val();
+                let data_of = 'name';
+                update_task(data_id, data_of, data_value)
+            });
+
+            $(document).on('change', '.t_state', function() {
+                let data_id = ($(this).attr('data_id')).toString();
+                let data_value = $(this).val();
+                let data_of = 'state';
+                update_task(data_id, data_of, data_value)
+            });
+
+            function update_task(data_id, data_of, data_value){
+                $.ajax({
+                    url: base_url + 'api_update_task',
+                    method: 'POST',
+                    type: 'json',
+                    data: {
+                        'csrfmiddlewaretoken': '{{ csrf_token }}',
+                        'data_id': data_id,
+                        'data_of': data_of,
+                        'data_value': data_value
+                    },
+                    success: function (data) {
+                        if (data['success'] == 1) {
+                            get_tasks(data['project_id']);
+                        } else {
+                            console.log('error');
+                        }
+                    },
+                    error: function () {
+                        console.log('error');
+                    }
+                });
+
+            }
+
+
+
+        });
+    </script>
+
+{% endblock js %}
